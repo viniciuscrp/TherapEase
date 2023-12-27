@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-using TherapEase.Models;
-using TherapEase.Models.ViewModels;
+﻿using TherapEase.Models.ViewModels;
 
 namespace TherapEase.Repositories.Interfaces
 {
