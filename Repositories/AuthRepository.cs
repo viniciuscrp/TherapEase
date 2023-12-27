@@ -35,8 +35,7 @@ namespace TherapEase.Repositories
                 var userRefreshToken = new UserRefreshToken
                 {
                     Email = entity.Email,
-                    RefreshToken = tokenResult.RefreshToken,
-                    IsActive = true,
+                    RefreshToken = authTokens.RefreshToken,
                 };
 
                 await RevokeRefreshTokensAsync(email);   
