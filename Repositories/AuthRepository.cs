@@ -39,6 +39,8 @@ namespace TherapEase.Repositories
                     RefreshToken = tokenResult.RefreshToken,
                     IsActive = true,
                 };
+
+                await RevokeRefreshTokensAsync(email);   
                 _userRefreshTokens.Add(userRefreshToken);
                 await context.SaveChangesAsync();
                 return user;
@@ -47,7 +49,7 @@ namespace TherapEase.Repositories
             return null;
         }
 
-        public AuthTokens GenerateToken(string email)
+        private AuthTokens GenerateToken(string email)
         {
             try
             {
@@ -57,7 +59,7 @@ namespace TherapEase.Repositories
                 {
                     Subject = new ClaimsIdentity(new Claim[]
                     {
-                        new Claim(ClaimTypes.Name, email)
+                        new(ClaimTypes.Name, email)
                     }),
                     Expires = DateTime.Now.AddHours(24),
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature)
@@ -77,17 +79,15 @@ namespace TherapEase.Repositories
             }
         }
 
-        public string GenerateRefreshToken()
+        private string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomNumber);
-                return Convert.ToBase64String(randomNumber);
-            }
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
         {
             var key = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]);
             var randomNumber = new byte[32];
@@ -110,6 +110,38 @@ namespace TherapEase.Repositories
             }
 
             return principal;
+        }
+
+        private async Task RevokeRefreshTokensAsync(string email)
+        {
+            try
+            {
+                var userRefreshTokens = await GetUserRefreshTokensAsync(email);
+                if (userRefreshTokens.Count == 0)
+                {
+                    return;
+                }
+
+                _userRefreshTokens.RemoveRange(userRefreshTokens);
+                await context.SaveChangesAsync();
+            }
+            catch
+            {
+                throw new Exception("Failed to revoke old refresh tokens!");
+            }
+        }
+
+        private async Task<List<UserRefreshToken>> GetUserRefreshTokensAsync(string email)
+        {
+            try
+            {
+                List<UserRefreshToken> userRefreshTokens = await _userRefreshTokens.Where(urt => urt.Email == email).ToListAsync();
+                return userRefreshTokens;
+            }
+            catch
+            {
+                throw new Exception("Failed to retrieve user refresh tokens");
+            }
         }
     }
 }
