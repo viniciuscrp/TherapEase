@@ -12,9 +12,10 @@ using TherapEase.Repositories.Interfaces;
 
 namespace TherapEase.Repositories
 {
-    public class AuthRepository(ApiContext context, IConfiguration configuration) : IAuthRepository
+    public class AuthRepository(ApiContext context, IConfiguration configuration, IHttpContextAccessor httpContextAccessor) : IAuthRepository
     {
         private readonly IConfiguration _configuration = configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         protected readonly DbSet<User> _userDbSet = context.Set<User>();
         protected readonly DbSet<UserRefreshToken> _userRefreshTokens = context.Set<UserRefreshToken>();
 
@@ -43,6 +44,9 @@ namespace TherapEase.Repositories
                 await RevokeRefreshTokensAsync(email);   
                 _userRefreshTokens.Add(userRefreshToken);
                 await context.SaveChangesAsync();
+                _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", user.Token);
+                _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", user.RefreshToken);
+                _httpContextAccessor.HttpContext.Response.Cookies.Append("X-User-Id", user.Id.ToString());
                 return user;
             }
 
