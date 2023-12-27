@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TherapEase.Extensions;
+using TherapEase.Helpers;
 using TherapEase.Models.ViewModels;
 using TherapEase.Repositories.Interfaces;
 
@@ -54,12 +56,12 @@ namespace TherapEase.Controllers
             {
                 var accessToken = string.Empty;
                 var refreshToken = string.Empty;
-                if (!Request.Cookies.TryGetValue("X-Access-Token", out accessToken))
+                if (!Request.Cookies.TryGetValue(Constants.Cookies.AccessToken.GetDescription(), out accessToken))
                 {
                     return Unauthorized();
                 }
 
-                if (!Request.Cookies.TryGetValue("X-Refresh-Token", out refreshToken))
+                if (!Request.Cookies.TryGetValue(Constants.Cookies.RefreshToken.GetDescription(), out refreshToken))
                 {
                     return Unauthorized();
                 }

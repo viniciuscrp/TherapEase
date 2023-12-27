@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Text;
 using TherapEase.Context;
 using TherapEase.Data.Entities;
+using TherapEase.Extensions;
+using TherapEase.Helpers;
 using TherapEase.Models;
 using TherapEase.Models.ViewModels;
 using TherapEase.Repositories.Interfaces;
@@ -181,9 +183,9 @@ namespace TherapEase.Repositories
             await RevokeRefreshTokensAsync(userRefreshToken.Email);
             _userRefreshTokens.Add(userRefreshToken);
             await context.SaveChangesAsync();
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", authTokens.AccessToken, new() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", authTokens.RefreshToken, new () { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-User-Id", userId.ToString(), new () { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(Constants.Cookies.AccessToken.GetDescription(), authTokens.AccessToken, new() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(Constants.Cookies.RefreshToken.GetDescription(), authTokens.RefreshToken, new () { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            _httpContextAccessor.HttpContext.Response.Cookies.Append(Constants.Cookies.UserId.GetDescription(), userId.ToString(), new () { HttpOnly = true, SameSite = SameSiteMode.Strict });
         }
     }
 }
