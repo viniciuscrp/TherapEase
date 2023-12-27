@@ -31,9 +31,7 @@ namespace TherapEase.Repositories
             if (result)
             {
                 var user = new UserViewModel(entity);
-                var tokenResult = GenerateToken(email);
-                user.Token = tokenResult.AccessToken;
-                user.RefreshToken = tokenResult.RefreshToken;
+                var authTokens = GenerateToken(email);
                 var userRefreshToken = new UserRefreshToken
                 {
                     Email = entity.Email,

@@ -14,11 +14,5 @@ namespace TherapEase.Models.ViewModels
         public int Id { get; set; }
 
         public string Name { get; set; }
-
-        [JsonIgnore]
-        public string Token { get; set; }
-
-        [JsonIgnore]
-        public string RefreshToken { get; set; }
     }
 }
