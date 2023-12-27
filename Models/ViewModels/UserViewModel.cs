@@ -1,4 +1,5 @@
-﻿using TherapEase.Data.Entities;
+﻿using System.Text.Json.Serialization;
+using TherapEase.Data.Entities;
 
 namespace TherapEase.Models.ViewModels
 {
@@ -14,8 +15,10 @@ namespace TherapEase.Models.ViewModels
 
         public string Name { get; set; }
 
+        [JsonIgnore]
         public string Token { get; set; }
 
+        [JsonIgnore]
         public string RefreshToken { get; set; }
     }
 }
