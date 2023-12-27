@@ -45,5 +45,39 @@ namespace TherapEase.Controllers
 
             return BadRequest();
         }
+
+
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            try
+            {
+                var accessToken = string.Empty;
+                var refreshToken = string.Empty;
+                if (!Request.Cookies.TryGetValue("X-Access-Token", out accessToken))
+                {
+                    return Unauthorized();
+                }
+
+                if (!Request.Cookies.TryGetValue("X-Refresh-Token", out refreshToken))
+                {
+                    return Unauthorized();
+                }
+
+                if (string.IsNullOrWhiteSpace(accessToken) || string.IsNullOrEmpty(refreshToken))
+                {
+                    return Unauthorized();
+                }
+
+                await _authRepository.RefreshAccessToken(accessToken, refreshToken);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                Console.Write(ex.Message);
+            }
+
+            return BadRequest();
+        }
     }
 }

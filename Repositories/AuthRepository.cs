@@ -21,28 +21,64 @@ namespace TherapEase.Repositories
 
         public async Task<UserViewModel> Login(string email, string password)
         {
-            var entity = await _userDbSet.Where(user => user.Email == email).FirstOrDefaultAsync();
-            if (entity == null)
+            var user = await _userDbSet.Where(user => user.Email == email).FirstOrDefaultAsync();
+            if (user == null)
             {
                 return null;
             }
 
-            var result = BCrypt.Net.BCrypt.EnhancedVerify(password, entity.Password);
+            var result = BCrypt.Net.BCrypt.EnhancedVerify(password, user.Password);
             if (result)
             {
-                var user = new UserViewModel(entity);
+                var userViewModel = new UserViewModel(user);
                 var authTokens = GenerateToken(email);
                 var userRefreshToken = new UserRefreshToken
                 {
-                    Email = entity.Email,
+                    Email = user.Email,
                     RefreshToken = authTokens.RefreshToken,
                 };
 
-                await HandleTokenAssignment(context, email, authTokens, userRefreshToken);
-                return user;
+                await HandleTokenAssignment(context, user.Id, authTokens, userRefreshToken);
+                return userViewModel;
             }
 
             return null;
+        }
+
+        public async Task RefreshAccessToken(string accessToken, string refreshToken)
+        {
+            var claims = GetPrincipalFromExpiredToken(accessToken);
+            if (claims == null)
+            {
+                throw new Exception("Invalid Access Token");
+            }
+
+            var email = claims.Claims.First().Subject.Name;
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new Exception("Invalid Access Token");
+            }
+
+            var user = await _userDbSet.FirstOrDefaultAsync(user => user.Email == email);
+            if (user == null)
+            {
+                throw new Exception("Invalid Access Token");
+            }
+
+            var userRefreshToken = await _userRefreshTokens.FirstOrDefaultAsync(urf => urf.Email == email && urf.RefreshToken == refreshToken);
+            if (userRefreshToken == null)
+            {
+                throw new Exception("Invalid Refresh Token");
+            }
+
+            var authTokens = GenerateToken(email); 
+            userRefreshToken = new UserRefreshToken
+            {
+                Email = user.Email,
+                RefreshToken = authTokens.RefreshToken,
+            };
+            
+            await HandleTokenAssignment(context, user.Id, authTokens, userRefreshToken);
         }
 
         private AuthTokens GenerateToken(string email)
@@ -140,13 +176,14 @@ namespace TherapEase.Repositories
             }
         }
 
-        private async Task HandleTokenAssignment(ApiContext context, string email, AuthTokens authTokens, UserRefreshToken userRefreshToken)
+        private async Task HandleTokenAssignment(ApiContext context, int userId, AuthTokens authTokens, UserRefreshToken userRefreshToken)
         {
-            await RevokeRefreshTokensAsync(email);
+            await RevokeRefreshTokensAsync(userRefreshToken.Email);
             _userRefreshTokens.Add(userRefreshToken);
             await context.SaveChangesAsync();
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", authTokens.AccessToken);
-            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", authTokens.RefreshToken);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", authTokens.AccessToken, new() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", authTokens.RefreshToken, new () { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-User-Id", userId.ToString(), new () { HttpOnly = true, SameSite = SameSiteMode.Strict });
         }
     }
 }
