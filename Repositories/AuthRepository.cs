@@ -38,12 +38,7 @@ namespace TherapEase.Repositories
                     RefreshToken = authTokens.RefreshToken,
                 };
 
-                await RevokeRefreshTokensAsync(email);   
-                _userRefreshTokens.Add(userRefreshToken);
-                await context.SaveChangesAsync();
-                _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", user.Token);
-                _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", user.RefreshToken);
-                _httpContextAccessor.HttpContext.Response.Cookies.Append("X-User-Id", user.Id.ToString());
+                await HandleTokenAssignment(context, email, authTokens, userRefreshToken);
                 return user;
             }
 
@@ -143,6 +138,15 @@ namespace TherapEase.Repositories
             {
                 throw new Exception("Failed to retrieve user refresh tokens");
             }
+        }
+
+        private async Task HandleTokenAssignment(ApiContext context, string email, AuthTokens authTokens, UserRefreshToken userRefreshToken)
+        {
+            await RevokeRefreshTokensAsync(email);
+            _userRefreshTokens.Add(userRefreshToken);
+            await context.SaveChangesAsync();
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Access-Token", authTokens.AccessToken);
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", authTokens.RefreshToken);
         }
     }
 }
