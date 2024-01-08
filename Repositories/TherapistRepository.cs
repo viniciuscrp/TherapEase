@@ -4,7 +4,7 @@ using TherapEase.Repositories.Interfaces;
 
 namespace TherapEase.Repositories
 {
-    public class UserRepository(ApiContext context) : Repository<User>(context), IUserRepository
+    public class TherapistRepository(ApiContext context) : Repository<User>(context), ITherapistRepository
     {
     }
 }

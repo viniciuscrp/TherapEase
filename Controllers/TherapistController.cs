@@ -8,10 +8,10 @@ namespace TherapEase.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class TherapistController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        private readonly ITherapistRepository _userRepository;
+        public TherapistController(ITherapistRepository userRepository)
         {
             _userRepository = userRepository;
         }

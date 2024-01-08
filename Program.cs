@@ -62,7 +62,7 @@ builder.Services.AddAuthentication(x =>
         o.Cookie.IsEssential = true;
     });
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITherapistRepository, TherapistRepository>();
 builder.Services.AddScoped<IPacientRepository, PacientRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 
