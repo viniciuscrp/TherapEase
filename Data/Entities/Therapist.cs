@@ -5,7 +5,7 @@ using TherapEase.Data.Entities.Base;
 namespace TherapEase.Data.Entities
 {
     [Index(nameof(Email), IsUnique = true)]
-    public class User : BaseEntity
+    public class Therapist : BaseEntity
     {
         [Column(TypeName  = "varchar(100)")]
         public string Name { get; set; }

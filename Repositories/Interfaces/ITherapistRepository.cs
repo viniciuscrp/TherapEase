@@ -2,7 +2,7 @@
 
 namespace TherapEase.Repositories.Interfaces
 {
-    public interface ITherapistRepository : IRepository<User>
+    public interface ITherapistRepository : IRepository<Therapist>
     {
     }
 }

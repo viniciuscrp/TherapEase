@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TherapEase.Context;
 
@@ -10,9 +11,11 @@ using TherapEase.Context;
 namespace TherapEase.Migrations
 {
     [DbContext(typeof(ApiContext))]
-    partial class ApiContextModelSnapshot : ModelSnapshot
+    [Migration("20240108003121_ChangedUserToTherapist")]
+    partial class ChangedUserToTherapist
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,17 +35,12 @@ namespace TherapEase.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("varchar(100)");
 
-                    b.Property<int>("TherapistId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("TherapistId");
 
                     b.ToTable("Pacients");
                 });
 
-            modelBuilder.Entity("TherapEase.Data.Entities.Therapist", b =>
+            modelBuilder.Entity("TherapEase.Data.Entities.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -85,17 +83,6 @@ namespace TherapEase.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserRefreshTokens");
-                });
-
-            modelBuilder.Entity("TherapEase.Data.Entities.Pacient", b =>
-                {
-                    b.HasOne("TherapEase.Data.Entities.Therapist", "Therapist")
-                        .WithMany()
-                        .HasForeignKey("TherapistId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Therapist");
                 });
 #pragma warning restore 612, 618
         }

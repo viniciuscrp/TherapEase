@@ -5,7 +5,7 @@ namespace TherapEase.Models.ViewModels
 {
     public class UserViewModel
     {
-        public UserViewModel(User user)
+        public UserViewModel(Therapist user)
         {
             Id = user.Id;
             Name = user.Name;

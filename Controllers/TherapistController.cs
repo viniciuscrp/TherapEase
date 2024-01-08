@@ -22,7 +22,7 @@ namespace TherapEase.Controllers
         /// <param name="user">User object</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] User user)
+        public async Task<IActionResult> Create([FromBody] Therapist user)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace TherapEase.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, User user)
+        public async Task<IActionResult> Update(int id, Therapist user)
         {
             try
             {

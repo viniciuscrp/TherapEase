@@ -18,7 +18,7 @@ namespace TherapEase.Repositories
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
-        protected readonly DbSet<User> _userDbSet = context.Set<User>();
+        protected readonly DbSet<Therapist> _userDbSet = context.Set<Therapist>();
         protected readonly DbSet<UserRefreshToken> _userRefreshTokens = context.Set<UserRefreshToken>();
 
         public async Task<UserViewModel> Login(string email, string password)
