@@ -7,5 +7,9 @@ namespace TherapEase.Data.Entities
     {
         [Column(TypeName = "varchar(100)")]
         public string Name { get; set; }
+
+        public int TherapistId { get; set; }
+
+        public Therapist Therapist { get; set; }
     }
 }
