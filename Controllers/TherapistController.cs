@@ -19,26 +19,31 @@ namespace TherapEase.Controllers
         /// <summary>
         /// Registers an User
         /// </summary>
-        /// <param name="user">User object</param>
+        /// <param name="registerViewModel">RegisterViewModel object</param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] Therapist user)
+        public async Task<IActionResult> Create([FromBody] RegisterViewModel registerViewModel)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(user.Email))
+                if (string.IsNullOrWhiteSpace(registerViewModel.Email))
                 {
-                    throw new Exception("Invalid email address");
+                    throw new ArgumentNullException("Invalid email address");
                 }
 
-                if (string.IsNullOrWhiteSpace(user.Password))
+                if (string.IsNullOrWhiteSpace(registerViewModel.Password))
                 {
                     throw new ArgumentNullException("Empty password");
                 }
 
-                var password = BCrypt.Net.BCrypt.EnhancedHashPassword(user.Password, 13);
-                user.Password = password;
-                await _userRepository.Create(user);
+                var alreadyExists = await _userRepository.Get(entity => entity.Email.Equals(registerViewModel.Email, StringComparison.CurrentCultureIgnoreCase));
+                if (alreadyExists != null)
+                {
+                    return new BadRequestObjectResult(new { message = "Email address already in use" });
+                }
+
+                var therapist = new Therapist(registerViewModel.Name, registerViewModel.Email, registerViewModel.Password);
+                await _userRepository.Create(therapist);
                 return NoContent();
             }
             catch (Exception ex)
@@ -48,7 +53,7 @@ namespace TherapEase.Controllers
                     return new BadRequestObjectResult(new { ex.Message });
                 }
 
-                return BadRequest("Something realy bad happened :(");
+                return BadRequest("Something really bad happened :(");
             }
         }
 
@@ -141,5 +146,7 @@ namespace TherapEase.Controllers
                 return BadRequest("Something realy bad happened :(");
             }
         }
+
+
     }
 }
