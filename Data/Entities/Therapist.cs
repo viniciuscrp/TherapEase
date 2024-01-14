@@ -7,6 +7,15 @@ namespace TherapEase.Data.Entities
     [Index(nameof(Email), IsUnique = true)]
     public class Therapist : BaseEntity
     {
+        public Therapist() {}
+
+        public Therapist(string name, string email, string password)
+        {
+            Name = name;
+            Email = email;
+            Password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, 13);
+        }
+
         [Column(TypeName  = "varchar(100)")]
         public string Name { get; set; }
 
