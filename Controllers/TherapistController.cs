@@ -17,7 +17,7 @@ namespace TherapEase.Controllers
         }
 
         /// <summary>
-        /// Registers an User
+        /// Registers an Therapist
         /// </summary>
         /// <param name="registerViewModel">RegisterViewModel object</param>
         /// <returns></returns>
